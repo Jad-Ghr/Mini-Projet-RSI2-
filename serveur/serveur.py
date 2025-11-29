@@ -165,5 +165,3 @@ class GestionnaireTaches () :
         with self._lock:
             return self._tasks.get(task_id)
         
-    
-    
