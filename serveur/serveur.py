@@ -5,7 +5,7 @@ from os.path import exists
 from socket import socket, AF_INET, SOCK_STREAM, SOL_SOCKET, SO_REUSEADDR
 from concurrent.futures import ThreadPoolExecutor
 
-from .model import Tache
+from model import Tache
 
 class GestionnaireTaches:
     def __init__(self, persist_path=None, persist=False) -> None:
