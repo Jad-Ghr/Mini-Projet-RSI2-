@@ -1,5 +1,10 @@
 FROM python:3.11-slim
 
+# Install netcat for healthcheck
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends netcat-openbsd ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
 # Create non-root user
 RUN useradd --create-home appuser
 
@@ -21,4 +26,4 @@ CMD ["python", "-m", "serveur.main", \
      "--host", "0.0.0.0", \
      "--port", "9000", \
      "--persist", \
-     "--persist-path", "/home/appuser/app/tasks.json"]
+     "--persist-path", "/data/tasks.json"]
