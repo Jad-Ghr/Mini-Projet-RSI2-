@@ -1,0 +1,36 @@
+version: "3.8"
+
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: [
+      "python", "-m", "serveur.main",
+      "--host", "0.0.0.0",
+      "--port", "9000",
+      "--persist",
+      "--persist-path", "/data/tasks.json"
+    ]
+    volumes:
+      - tasks_data:/data
+    ports:
+      - "9000:9000"
+    restart: unless-stopped
+
+  # Optional: example client container
+  sample-client:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    depends_on:
+      - server
+    profiles: ["dev"]
+    command: [
+      "python", "-m", "client.main",
+      "--host", "server",
+      "--port", "9000"
+    ]
+
+volumes:
+  tasks_data:
