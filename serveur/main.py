@@ -1,7 +1,7 @@
 # server CLI entrypoint
 
 from argparse import ArgumentParser , Namespace
-from .serveur import ServeurTaches, GestionnaireTaches
+from serveur.serveur import ServeurTaches, GestionnaireTaches
 
 DEFAULT_HOST = "0.0.0.0"
 DEFAULT_PORT = 9000

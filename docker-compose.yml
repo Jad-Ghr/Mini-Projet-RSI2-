@@ -1,36 +1,38 @@
-version: "3.8"
-
 services:
   server:
     build:
       context: .
       dockerfile: Dockerfile
-    command: [
-      "python", "-m", "serveur.main",
-      "--host", "0.0.0.0",
-      "--port", "9000",
-      "--persist",
-      "--persist-path", "/data/tasks.json"
-    ]
+    command: >
+      python -m serveur.main
+      --host 0.0.0.0
+      --port 9000
+      --persist
+      --persist-path /data/tasks.json
     volumes:
       - tasks_data:/data
     ports:
       - "9000:9000"
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "nc", "-z", "127.0.0.1", "9000"]
+      interval: 2s
+      retries: 10
+      timeout: 2s
 
-  # Optional: example client container
   sample-client:
     build:
       context: .
       dockerfile: Dockerfile.client
     depends_on:
-      - server
-    profiles: ["dev"]
-    command: [
-      "python", "-m", "client.main",
-      "--host", "server",
-      "--port", "9000"
-    ]
+      server:
+        condition: service_healthy
+    command: >
+      python -m client.main
+      --host server
+      --port 9000
+    stdin_open: true
+    tty: true
 
 volumes:
   tasks_data:
