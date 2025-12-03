@@ -19,22 +19,28 @@ class ClientTaches:
     def _send(self, payload) -> dict:
         """Send payload (a dict) and return JSON response (as dict)."""
         data = json.dumps(payload) + "\n"
+        try:
+            with socket.create_connection((self.host, self.port), timeout=self.timeout) as sock:
+                sock.sendall(data.encode("utf-8"))
 
-        with socket.create_connection((self.host, self.port), timeout=self.timeout) as sock:
-            sock.sendall(data.encode("utf-8"))
-
-            buffer = b""
-            while True:
-                chunk = sock.recv(4096)
-                if not chunk:
-                    break
-                buffer += chunk
-                if b"\n" in buffer:
-                    line, _ = buffer.split(b"\n", 1)
-                    try:
-                        return json.loads(line.decode("utf-8"))
-                    except json.JSONDecodeError:
-                        return {"status": "error", "error": "invalid_response"}
+                buffer = b""
+                while True:
+                    chunk = sock.recv(4096)
+                    if not chunk:
+                        break
+                    buffer += chunk
+                    if b"\n" in buffer:
+                        line, buffer = buffer.split(b"\n", 1)
+                        try:
+                            return json.loads(line.decode("utf-8").strip())
+                        except json.JSONDecodeError:
+                            return {"status": "error", "error": "invalid_response"}
+                # If we exit the loop without finding a newline
+                return {"status": "error", "error": "no_newline_in_response"}
+        except (ConnectionRefusedError, socket.timeout) as e:
+            return {"status": "error", "error": str(e)}
+        except Exception as e:
+            return {"status": "error", "error": str(e)}
 
         return {"status": "error", "error": "no_response"}
 
