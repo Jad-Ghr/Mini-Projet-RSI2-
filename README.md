@@ -30,4 +30,16 @@ This repository provides a small client-server task manager:
 
 ### Start server (no persistence)
 ```bash
+
 python -m serveur.main
+
+```
+
+## Quick run (Docker)
+
+```bash
+
+docker compose up --build
+docker compose run sample-client
+
+```
