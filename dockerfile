@@ -1,0 +1,24 @@
+FROM python:3.11-slim
+
+# Create non-root user
+RUN useradd --create-home appuser
+
+WORKDIR /home/appuser/app
+
+# Copy only server code
+COPY serveur /home/appuser/app/serveur
+
+RUN chown -R appuser:appuser /home/appuser/app
+USER appuser
+
+ENV PYTHONUNBUFFERED=1
+
+# We EXPOSE the default port, but Docker users can override
+EXPOSE 9000
+
+# Run server with CLI args used by your argparse parser
+CMD ["python", "-m", "serveur.main", \
+     "--host", "0.0.0.0", \
+     "--port", "9000", \
+     "--persist", \
+     "--persist-path", "/home/appuser/app/tasks.json"]
