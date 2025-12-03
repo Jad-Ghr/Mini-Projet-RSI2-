@@ -1,11 +1,13 @@
 from json import load, dump, loads, dumps, JSONDecodeError
 from threading import Lock
 from traceback import print_exc
-from os.path import exists
+import os
+from os.path import exists 
 from socket import socket, AF_INET, SOCK_STREAM, SOL_SOCKET, SO_REUSEADDR
 from concurrent.futures import ThreadPoolExecutor
 
-from model import Tache
+
+from .model import Tache
 
 class GestionnaireTaches:
     def __init__(self, persist_path=None, persist=False) -> None:
@@ -20,9 +22,12 @@ class GestionnaireTaches:
             self._load_from_file()
 
     def _load_from_file(self) -> None:
-        """Load tasks from JSON file if exists."""
+        """Load tasks from JSON file if exists and not empty."""
         try:
             if self.persist_path and exists(self.persist_path):
+                if os.path.getsize(self.persist_path) == 0:
+                    # File is empty, nothing to load
+                    return
                 with open(self.persist_path, "r", encoding="utf-8") as f:
                     data = load(f)
 
